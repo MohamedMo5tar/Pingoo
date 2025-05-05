@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>بينجو بينغو - لعبة متعددة اللاعبين</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- تسجيل الدخول -->
+    <div id="auth-container" class="auth-container">
+      <div class="auth-box">
+        <h3 class="text-center">تسجيل الدخول</h3>
+        <input
+          type="email"
+          id="email"
+          placeholder="البريد الإلكتروني"
+          class="form-control mb-2"
+        />
+        <input
+          type="password"
+          id="password"
+          placeholder="كلمة السر"
+          class="form-control mb-2"
+        />
+        <button id="loginBtn" class="btn btn-primary w-100">دخول</button>
+        <button id="signupBtn" class="btn btn-secondary w-100 mt-2">
+          إنشاء حساب
+        </button>
+        <button id="googleLogin" class="btn btn-google w-100 mt-2">
+          <i class="fab fa-google"></i> الدخول بجوجل
+        </button>
+      </div>
+    </div>
+
+    <!-- واجهة اللعبة الرئيسية -->
+    <div class="container" id="game-container" style="display: none">
+      <header class="text-center my-4">
+        <h1 class="display-4">بينجو بينغو</h1>
+        <p class="lead">أكمل الخطوط لربح حروف كلمة بينغو!</p>
+      </header>
+
+      <div class="row">
+        <!-- لوحة التحكم -->
+        <div class="col-md-4">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h3>إعدادات اللعبة</h3>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label for="playerName" class="form-label">اسم اللاعب</label>
+                <input type="text" class="form-control" id="playerName" />
+              </div>
+              <div class="mb-3">
+                <label for="gridSize" class="form-label">حجم الشبكة</label>
+                <select class="form-select" id="gridSize">
+                  <option value="3">3x3</option>
+                  <option value="4">4x4</option>
+                  <option value="5" selected>5x5</option>
+                  <option value="6">6x6</option>
+                  <option value="7">7x7</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="roomId" class="form-label">رقم الغرفة</label>
+                <input type="text" class="form-control" id="roomId" />
+              </div>
+              <button id="newGameBtn" class="btn btn-primary w-100 mb-2">
+                <i class="fas fa-plus-circle"></i> بدء لعبة جديدة
+              </button>
+              <button id="joinGameBtn" class="btn btn-info w-100 mb-2">
+                <i class="fas fa-sign-in-alt"></i> الانضمام إلى غرفة
+              </button>
+
+              <div class="mb-3">
+                <label for="numberInput" class="form-label">ادخل رقماً</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="numberInput"
+                  disabled
+                />
+              </div>
+              <div class="d-flex gap-2 mb-3">
+                <button
+                  id="checkNumberBtn"
+                  class="btn btn-success flex-grow-1"
+                  disabled
+                >
+                  <i class="fas fa-check"></i> تحقق
+                </button>
+                <button
+                  id="callNumberBtn"
+                  class="btn btn-warning flex-grow-1"
+                  disabled
+                >
+                  <i class="fas fa-random"></i> رقم عشوائي
+                </button>
+              </div>
+
+              <div class="called-numbers mb-3">
+                <h5>الأرقام المستدعاة:</h5>
+                <div id="calledNumbers" class="d-flex flex-wrap gap-2"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- تقدم بينغو -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h3>لاعبون في الغرفة: <span id="roomIdDisplay"></span></h3>
+            </div>
+            <div class="card-body">
+              <ul id="playersList" class="list-group"></ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>تقدم بينغو</h3>
+            </div>
+            <div class="card-body">
+              <div id="pingooProgress" class="pingoo-letters">
+                <span class="letter" data-letter="ب">ب</span>
+                <span class="letter" data-letter="ي">ي</span>
+                <span class="letter" data-letter="ن">ن</span>
+                <span class="letter" data-letter="غ">غ</span>
+                <span class="letter" data-letter="و">و</span>
+              </div>
+              <div id="pingooMessage" class="mt-3 text-center"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- بطاقة البينجو -->
+        <div class="col-md-8">
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h3>بطاقتك</h3>
+              <span id="playerDisplay" class="badge bg-primary">لاعب: ضيف</span>
+            </div>
+            <div class="card-body">
+              <div id="bingoGrid" class="bingo-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- مكتبات Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+
+    <!-- مكتبة Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- الأصوات -->
+    <audio
+      id="lineCompleteSound"
+      src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="letterEarnedSound"
+      src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="winSound"
+      src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"
+      preload="auto"
+    ></audio>
+
+    <script src="script.js"></script>
+  </body>
+</html>
